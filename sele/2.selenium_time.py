@@ -46,12 +46,12 @@ time.sleep(1)
 print("开始输入登录账号")  # 打印页面的标题
 unipt = driver.find_element(By.XPATH, '//input[@placeholder="请输入账号"]')
 unipt.click()
-unipt.send_keys("15153560513")
+unipt.send_keys("17686026701")
 # 输入账号
 print("开始输入密码")  # 打印页面的标题
 pwdipt = driver.find_element(By.XPATH, '//input[@placeholder="请输入密码"]')
 pwdipt.click()
-pwdipt.send_keys("203105800")
+pwdipt.send_keys("203105800liulei")
 
 # 点击登录
 print("开始点击登录按钮")
@@ -69,11 +69,13 @@ if not login_success:
     print("登录失败")
 else:
     print("登录成功")
+
+driver.get("https://search.bilibili.com/all?keyword=%E4%BA%92%E5%85%B3")
+time.sleep(5)
 for i in range(start_page):
     nextPage = driver.find_element(By.XPATH, '//button[text()="下一页"]')
     nextPage.click()
     time.sleep(5)
-driver.get("https://search.bilibili.com/all?keyword=%E4%BA%92%E5%85%B3")
 dizan_current_page()
 try:
     while (total<500):
