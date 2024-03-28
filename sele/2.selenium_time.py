@@ -1,91 +1,109 @@
 from selenium import webdriver
 import time
-
 from selenium.webdriver.common.by import By
 
-total = 0
-current_page = 0
-start_page = 2
-def is_login_seccess():
-    try:
-        btn = driver.find_element(By.XPATH, '//div[contains(@class,"header-login-entry")]/..')
-        return False
-    except:
-        return True
+class bilibili(object):
+    def __init__(self,username,pwd):
+        self.__username = username
+        self.__pwd = pwd
+        self.__total = 0
+        self.__start_page = 2
+        self.__max_num = 9999
+        self.driver = webdriver.Chrome()
+        self.driver.get("https://www.bilibili.com/")
 
-def dizan_current_page():
-    global total
-    videoList = driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')
-    for i in range(len(videoList)):
-        try:
-            video = driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')[i]
-            driver.get(video.get_attribute("href"))
-            time.sleep(5)
-            textarea = driver.find_element(By.XPATH, '//textarea')
-            textarea.click()
-            textarea.send_keys("互关")
-            send_btn = driver.find_element(By.XPATH, '//div[contains(@class,"reply-box-send")]')
-            send_btn.click()
-            time.sleep(2)
-            driver.back()
-            total += 1
-            print(str(total) + '条记录成功')
-        except:
-            print(str(total) + '条记录失败')
+    def run(self):
+        # 1.开始登录
+        self.__login()
 
-
-driver = webdriver.Chrome()
-driver.get("https://www.bilibili.com/")
-
-print("开始进入登录页面")  # 打印页面的标题
-showLoginBtn = driver.find_element(By.XPATH, '//div[contains(@class,"header-login-entry")]/..')
-# print(showLoginBtn)
-showLoginBtn.click()
-time.sleep(1)
-# 输入账号
-print("开始输入登录账号")  # 打印页面的标题
-unipt = driver.find_element(By.XPATH, '//input[@placeholder="请输入账号"]')
-unipt.click()
-unipt.send_keys("15153560513")
-# 输入账号
-print("开始输入密码")  # 打印页面的标题
-pwdipt = driver.find_element(By.XPATH, '//input[@placeholder="请输入密码"]')
-pwdipt.click()
-pwdipt.send_keys("203105800")
-
-# 点击登录
-print("开始点击登录按钮")
-loginBtn = driver.find_element(By.XPATH, '//div[contains(@class,"btn_primary")]')
-loginBtn.click()
-
-login_success = True
-for i in range(10):
-    login_success = is_login_seccess()
-    if not login_success:
-        time.sleep(3)
-        print("登录出现异常，3秒后重试")
-
-if not login_success:
-    print("登录失败")
-else:
-    print("登录成功")
-for i in range(start_page):
-    nextPage = driver.find_element(By.XPATH, '//button[text()="下一页"]')
-    nextPage.click()
-    time.sleep(5)
-driver.get("https://search.bilibili.com/all?keyword=%E4%BA%92%E5%85%B3")
-dizan_current_page()
-try:
-    while (total<500):
-        nextPage = driver.find_element(By.XPATH, '//button[text()="下一页"]')
-        nextPage.click()
+        # 1.1 跳转到搜索页面
+        self.driver.get("https://search.bilibili.com/all?keyword=%E4%BA%92%E5%85%B3")
         time.sleep(5)
-        dizan_current_page()
-except:
-    print("所有页面完成")
 
-# print(videoList)
+        # 2.从start_page页开始
+        self.__step_page()
 
-time.sleep(10)
-# 退出模拟浏览器
-driver.quit()  # 一定要退出!不退出会有残留进程!
+        # 3. 开始点赞当前页
+        self.__dizan_current_page()
+
+        # 4. 跳转到下一页点赞
+        try:
+            while (self.total < self.__max_num):
+                nextPage = self.driver.find_element(By.XPATH, '//button[text()="下一页"]')
+                nextPage.click()
+                time.sleep(5)
+                self.__dizan_current_page()
+        except:
+            print("所有页面完成")
+        # 5.退出模拟浏览器
+        self.driver.quit()  # 一定要退出!不退出会有残留进程!
+
+    def __login(self):
+        # 1进入登录页面
+        print("开始进入登录页面")  # 打印页面的标题
+        showLoginBtn = self.driver.find_element(By.XPATH, '//div[contains(@class,"header-login-entry")]/..')
+        showLoginBtn.click()
+        time.sleep(1)
+        # 2输入账号
+        print("开始输入登录账号")  # 打印页面的标题
+        unipt = self.driver.find_element(By.XPATH, '//input[@placeholder="请输入账号"]')
+        unipt.click()
+        unipt.send_keys(self.__username)
+        # 3输入账号
+        print("开始输入密码")  # 打印页面的标题
+        pwdipt = self.driver.find_element(By.XPATH, '//input[@placeholder="请输入密码"]')
+        pwdipt.click()
+        pwdipt.send_keys(self.__pwd)
+
+        # 4点击登录按钮
+        print("开始点击登录按钮")
+        loginBtn = self.driver.find_element(By.XPATH, '//div[contains(@class,"btn_primary")]')
+        loginBtn.click()
+
+        # 5判断是否成功
+        login_success = True
+        for i in range(10):
+            login_success = self.__is_login_seccess()
+            if not login_success:
+                time.sleep(3)
+                print("登录出现异常，3秒后重试")
+        if not login_success:
+            print("登录失败")
+        else:
+            print("登录成功")
+
+    def __step_page(self):
+        for i in range(self.__start_page):
+            nextPage = self.driver.find_element(By.XPATH, '//button[text()="下一页"]')
+            nextPage.click()
+            time.sleep(5)
+    def __dizan_current_page(self):
+        videoList = self.driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')
+        for i in range(len(videoList)):
+            self.__total += 1
+            try:
+                video = self.driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')[i]
+                self.driver.get(video.get_attribute("href"))
+                time.sleep(5)
+                textarea = self.driver.find_element(By.XPATH, '//textarea')
+                textarea.click()
+                textarea.send_keys("互关")
+                send_btn = self.driver.find_element(By.XPATH, '//div[contains(@class,"reply-box-send")]')
+                send_btn.click()
+                time.sleep(2)
+                self.driver.back()
+                print(str(self.__total) + '条记录成功')
+            except:
+                print(str(self.__total) + '条记录失败')
+
+    def __is_login_seccess(self):
+        try:
+            btn = self.driver.find_element(By.XPATH, '//div[contains(@class,"header-login-entry")]/..')
+            return False
+        except:
+            return True
+
+
+if __name__ == '__main__':
+    bilibili = bilibili(username='1',pwd='2')
+    bilibili.run()
