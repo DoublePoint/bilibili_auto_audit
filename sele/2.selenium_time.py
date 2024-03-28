@@ -13,18 +13,21 @@ def is_login_seccess():
         return True
 
 def dizan_current_page():
+    global total
     videoList = driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')
     for i in range(len(videoList)):
         video = driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')[i]
         driver.get(video.get_attribute("href"))
-        time.sleep(2)
+        time.sleep(5)
         textarea = driver.find_element(By.XPATH, '//textarea')
         textarea.click()
         textarea.send_keys("互赞")
-        send_btn = driver.find_element(By.XPATH, '//div[@class="reply-box-send"]')
+        send_btn = driver.find_element(By.XPATH, '//div[contains(@class,"reply-box-send")]')
         send_btn.click()
         time.sleep(2)
-        print(++total + '条记录已经点赞')
+        driver.back()
+        total+=1
+        print(str(total) + '条记录已经点赞')
 
 
 driver = webdriver.Chrome()
@@ -32,7 +35,7 @@ driver.get("https://www.bilibili.com/")
 
 print("开始进入登录页面")  # 打印页面的标题
 showLoginBtn = driver.find_element(By.XPATH, '//div[contains(@class,"header-login-entry")]/..')
-print(showLoginBtn)
+# print(showLoginBtn)
 showLoginBtn.click()
 time.sleep(1)
 # 输入账号
@@ -68,6 +71,7 @@ dizan_current_page()
 try:
     if(++current_page<10):
         nextPage = driver.find_element(By.XPATH, '//button[text()="下一页"]')
+        nextPage.click()
         time.sleep(5)
         dizan_current_page()
 except:
