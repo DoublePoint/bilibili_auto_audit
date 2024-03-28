@@ -4,8 +4,8 @@ import time
 from selenium.webdriver.common.by import By
 
 total = 0
-current_page = 0;
-start_page = 2;
+current_page = 0
+start_page = 2
 def is_login_seccess():
     try:
         btn = driver.find_element(By.XPATH, '//div[contains(@class,"header-login-entry")]/..')
@@ -17,18 +17,21 @@ def dizan_current_page():
     global total
     videoList = driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')
     for i in range(len(videoList)):
-        video = driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')[i]
-        driver.get(video.get_attribute("href"))
-        time.sleep(5)
-        textarea = driver.find_element(By.XPATH, '//textarea')
-        textarea.click()
-        textarea.send_keys("互关")
-        send_btn = driver.find_element(By.XPATH, '//div[contains(@class,"reply-box-send")]')
-        send_btn.click()
-        time.sleep(2)
-        driver.back()
-        total+=1
-        print(str(total) + '条记录已经点赞')
+        try:
+            video = driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')[i]
+            driver.get(video.get_attribute("href"))
+            time.sleep(5)
+            textarea = driver.find_element(By.XPATH, '//textarea')
+            textarea.click()
+            textarea.send_keys("互关")
+            send_btn = driver.find_element(By.XPATH, '//div[contains(@class,"reply-box-send")]')
+            send_btn.click()
+            time.sleep(2)
+            driver.back()
+            total += 1
+            print(str(total) + '条记录成功')
+        except:
+            print(str(total) + '条记录失败')
 
 
 driver = webdriver.Chrome()
@@ -66,14 +69,13 @@ if not login_success:
     print("登录失败")
 else:
     print("登录成功")
-
+for i in range(start_page):
+    nextPage = driver.find_element(By.XPATH, '//button[text()="下一页"]')
+    nextPage.click()
+    time.sleep(5)
 driver.get("https://search.bilibili.com/all?keyword=%E4%BA%92%E5%85%B3")
 dizan_current_page()
 try:
-    for i in range(start_page):
-        nextPage = driver.find_element(By.XPATH, '//button[text()="下一页"]')
-        nextPage.click()
-        time.sleep(5)
     while (total<500):
         nextPage = driver.find_element(By.XPATH, '//button[text()="下一页"]')
         nextPage.click()
