@@ -21,7 +21,7 @@ def dizan_current_page():
         time.sleep(5)
         textarea = driver.find_element(By.XPATH, '//textarea')
         textarea.click()
-        textarea.send_keys("互赞")
+        textarea.send_keys("互关互赞")
         send_btn = driver.find_element(By.XPATH, '//div[contains(@class,"reply-box-send")]')
         send_btn.click()
         time.sleep(2)
