@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 
 total = 0
 current_page = 0;
+start_page = 2;
 def is_login_seccess():
     try:
         btn = driver.find_element(By.XPATH, '//div[contains(@class,"header-login-entry")]/..')
@@ -21,7 +22,7 @@ def dizan_current_page():
         time.sleep(5)
         textarea = driver.find_element(By.XPATH, '//textarea')
         textarea.click()
-        textarea.send_keys("互关~")
+        textarea.send_keys("互关")
         send_btn = driver.find_element(By.XPATH, '//div[contains(@class,"reply-box-send")]')
         send_btn.click()
         time.sleep(2)
@@ -69,7 +70,11 @@ else:
 driver.get("https://search.bilibili.com/all?keyword=%E4%BA%92%E5%85%B3")
 dizan_current_page()
 try:
-    if(++current_page<10):
+    for i in range(start_page):
+        nextPage = driver.find_element(By.XPATH, '//button[text()="下一页"]')
+        nextPage.click()
+        time.sleep(5)
+    while (total<500):
         nextPage = driver.find_element(By.XPATH, '//button[text()="下一页"]')
         nextPage.click()
         time.sleep(5)
