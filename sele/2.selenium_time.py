@@ -3,12 +3,13 @@ import time
 from selenium.webdriver.common.by import By
 
 class bilibili(object):
-    def __init__(self,username,pwd):
+    def __init__(self,username,pwd,start_page=2,max_num=999,key_word=''):
         self.__username = username
         self.__pwd = pwd
         self.__total = 0
-        self.__start_page = 2
-        self.__max_num = 9999
+        self.__start_page = start_page
+        self.__max_num = max_num
+        self.__key_word = key_word
         self.driver = webdriver.Chrome()
         self.driver.get("https://www.bilibili.com/")
 
@@ -17,7 +18,7 @@ class bilibili(object):
         self.__login()
 
         # 1.1 跳转到搜索页面
-        self.driver.get("https://search.bilibili.com/all?keyword=%E4%BA%92%E5%85%B3")
+        self.driver.get("https://search.bilibili.com/all?keyword="+self.__key_word)
         time.sleep(5)
 
         # 2.从start_page页开始
@@ -28,11 +29,10 @@ class bilibili(object):
 
         # 4. 跳转到下一页点赞
         try:
-            while (self.total < self.__max_num):
-                nextPage = self.driver.find_element(By.XPATH, '//button[text()="下一页"]')
-                nextPage.click()
-                time.sleep(5)
-                self.__dizan_current_page()
+            nextPage = self.driver.find_element(By.XPATH, '//button[text()="下一页"]')
+            nextPage.click()
+            time.sleep(5)
+            self.__dizan_current_page()
         except:
             print("所有页面完成")
         # 5.退出模拟浏览器
@@ -82,17 +82,21 @@ class bilibili(object):
         for i in range(len(videoList)):
             self.__total += 1
             try:
-                video = self.driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')[i]
-                self.driver.get(video.get_attribute("href"))
-                time.sleep(5)
-                textarea = self.driver.find_element(By.XPATH, '//textarea')
-                textarea.click()
-                textarea.send_keys("互关")
-                send_btn = self.driver.find_element(By.XPATH, '//div[contains(@class,"reply-box-send")]')
-                send_btn.click()
-                time.sleep(2)
-                self.driver.back()
-                print(str(self.__total) + '条记录成功')
+                if (self.__total < self.__max_num):
+                    video = self.driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')[i]
+                    self.driver.get(video.get_attribute("href"))
+                    time.sleep(5)
+                    textarea = self.driver.find_element(By.XPATH, '//textarea')
+                    textarea.click()
+                    textarea.send_keys("互关,本条记录自动发送")
+                    send_btn = self.driver.find_element(By.XPATH, '//div[contains(@class,"reply-box-send")]')
+                    send_btn.click()
+                    time.sleep(2)
+                    self.driver.back()
+                    print(str(self.__total) + '条记录成功')
+                else:
+                    print(str(self.__total) + '条记录全部完成，MaxNum:'+str(self.__max_num))
+                    return
             except:
                 print(str(self.__total) + '条记录失败')
 
@@ -103,7 +107,6 @@ class bilibili(object):
         except:
             return True
 
-
 if __name__ == '__main__':
-    bilibili = bilibili(username='1',pwd='2')
+    bilibili = bilibili(username='17686026701',pwd='203105800liulei',max_num=100,start_page=1,key_word="互关互赞")
     bilibili.run()
