@@ -30,7 +30,7 @@ class bilibili(object):
 
         # 4. 跳转到下一页点赞
         try:
-            while (self.__current_page < self.__max_page):
+            while self.__current_page < self.__max_page:
                 nextPage = self.driver.find_element(By.XPATH, '//button[text()="下一页"]')
                 nextPage.click()
                 time.sleep(5)
