@@ -84,13 +84,14 @@ class bilibili(object):
         videoList = self.driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')
         for i in range(len(videoList)):
             self.__total += 1
+
             try:
                 video = self.driver.find_elements(By.XPATH, '//div[contains(@class,"bili-video-card__wrap")]/a')[i]
                 self.driver.get(video.get_attribute("href"))
                 time.sleep(5)
                 textarea = self.driver.find_element(By.XPATH, '//textarea')
                 textarea.click()
-                textarea.send_keys("互关,本条记录自动发送")
+                textarea.send_keys("互关")
                 send_btn = self.driver.find_element(By.XPATH, '//div[contains(@class,"reply-box-send")]')
                 send_btn.click()
                 time.sleep(2)
@@ -107,5 +108,5 @@ class bilibili(object):
             return True
 
 if __name__ == '__main__':
-    bilibili = bilibili(username='17686026701',pwd='203105800liulei',max_page=10,start_page=0,key_word="互关互赞")
+    bilibili = bilibili(username='17686026701',pwd='203105800liulei',max_page=2,start_page=0,key_word="互关互赞")
     bilibili.run()
