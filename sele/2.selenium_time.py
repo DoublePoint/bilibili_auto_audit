@@ -1,6 +1,13 @@
 from selenium import webdriver
 import time
 from selenium.webdriver.common.by import By
+import schedule
+from datetime import datetime
+from twilio.rest import Client
+
+account_sid = 'ACe9c8bb26b96eabb15afd73a566b82eb5'
+auth_token = 'c584157e41dc795a8304edee40770803'
+client = Client(account_sid, auth_token)
 
 class bilibili(object):
     def __init__(self,username,pwd,start_page=2,max_page=999,key_word=''):
@@ -17,9 +24,16 @@ class bilibili(object):
     def run(self):
         # 1.开始登录
         self.__login()
-
+        schedule.clear()
+        # 创建一个按3秒间隔执行任务
+        schedule.every(3*60*24).seconds.do(self.__audit)
+        while True:
+            schedule.run_pending()
+        # 5.退出模拟浏览器
+        # self.driver.quit()  # 一定要退出!不退出会有残留进程!
+    def __audit(self):
         # 1.1 跳转到搜索页面
-        self.driver.get("https://search.bilibili.com/all?keyword="+self.__key_word)
+        self.driver.get("https://search.bilibili.com/all?keyword=" + self.__key_word)
         time.sleep(5)
 
         # 2.从start_page页开始
@@ -35,12 +49,15 @@ class bilibili(object):
                 nextPage.click()
                 time.sleep(5)
                 self.__dizan_current_page()
-                self.__current_page+=1
+                self.__current_page += 1
         except:
             print("所有页面完成")
-        # 5.退出模拟浏览器
-        self.driver.quit()  # 一定要退出!不退出会有残留进程!
 
+        client.messages.create(
+            from_='+19382533388',
+            body='所有页面完成自动评论',
+            to='+8617686026701'
+        )
     def __login(self):
         # 1进入登录页面
         print("开始进入登录页面")  # 打印页面的标题
