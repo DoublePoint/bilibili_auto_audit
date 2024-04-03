@@ -3,10 +3,12 @@ import time
 from selenium.webdriver.common.by import By
 import schedule
 from datetime import datetime
+import os
 from twilio.rest import Client
+import os
 
-account_sid = 'ACe9c8bb26b96eabb15afd73a566b82eb5'
-auth_token = 'c584157e41dc795a8304edee40770803'
+account_sid = os.environ['TWILIO_ACCOUNT_SID']
+auth_token = os.environ['TWILIO_AUTH_TOKEN']
 client = Client(account_sid, auth_token)
 
 class bilibili(object):
