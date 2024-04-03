@@ -5,11 +5,15 @@ import schedule
 from datetime import datetime
 import os
 from twilio.rest import Client
-import os
 
 account_sid = os.environ['TWILIO_ACCOUNT_SID']
 auth_token = os.environ['TWILIO_AUTH_TOKEN']
 client = Client(account_sid, auth_token)
+client.messages.create(
+    from_='+19382533388',
+    body='所有页面完成自动评论',
+    to='+8617686026701'
+)
 
 class bilibili(object):
     def __init__(self,username,pwd,start_page=2,max_page=999,key_word=''):
@@ -29,8 +33,13 @@ class bilibili(object):
         schedule.clear()
         # 创建一个按3秒间隔执行任务
         schedule.every(3*60*24).seconds.do(self.__audit)
+        schedule.run_all()
         while True:
-            schedule.run_pending()
+            try:
+                schedule.run_pending()
+            except:
+                print("本次调度出错")
+
         # 5.退出模拟浏览器
         # self.driver.quit()  # 一定要退出!不退出会有残留进程!
     def __audit(self):
@@ -54,12 +63,14 @@ class bilibili(object):
                 self.__current_page += 1
         except:
             print("所有页面完成")
-
-        client.messages.create(
-            from_='+19382533388',
-            body='所有页面完成自动评论',
-            to='+8617686026701'
-        )
+        try:
+            client.messages.create(
+                from_='+19382533388',
+                body='所有页面完成自动评论',
+                to='+8617686026701'
+            )
+        except:
+            print("发送短信失败")
     def __login(self):
         # 1进入登录页面
         print("开始进入登录页面")  # 打印页面的标题
@@ -117,6 +128,7 @@ class bilibili(object):
                 self.driver.back()
                 print(str(self.__total) + '条记录成功')
             except:
+                self.driver.back()
                 print(str(self.__total) + '条记录失败')
 
     def __is_login_seccess(self):
